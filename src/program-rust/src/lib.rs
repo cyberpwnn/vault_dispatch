@@ -8,6 +8,7 @@ use solana_program::{
     program_error::ProgramError,
     pubkey::Pubkey,
 };
+mod bits;
 
 /// Represents all data dispatch will use on an account. Contains connection data & an optional name
 /// of this dispatch data
@@ -40,6 +41,7 @@ pub struct Message {
     pub message: Vec<u8>,
 }
 
+/// ID=5
 /// Delete all messages in every connection older than the specified time
 fn gc_conversations(holder:&AccountInfo, older_than:u64)
 {
@@ -50,6 +52,7 @@ fn gc_conversations(holder:&AccountInfo, older_than:u64)
     save_data(holder, holder_data);
 }
 
+/// ID=4
 /// Delete all messages in the given connection older than the specified time
 fn gc_conversation(holder:&AccountInfo, contact:&AccountInfo, older_than:u64)
 {
@@ -59,6 +62,7 @@ fn gc_conversation(holder:&AccountInfo, contact:&AccountInfo, older_than:u64)
     save_data(holder, holder_data);
 }
 
+/// ID=3
 /// Send a message from(account) to(account) at the given time, with the message itself
 fn send_message(from:&AccountInfo, to:&AccountInfo, timestamp:u64, message:Vec<u8>)
 {
@@ -71,6 +75,7 @@ fn send_message(from:&AccountInfo, to:&AccountInfo, timestamp:u64, message:Vec<u
     save_data(to, to_data);
 }
 
+/// ID=2
 /// Destroy a connection. Removes the source and destination connections & message history
 fn break_connection(requester:&AccountInfo, contact:&AccountInfo)
 {
@@ -82,6 +87,7 @@ fn break_connection(requester:&AccountInfo, contact:&AccountInfo)
     save_data(requester, requester_data);
 }
 
+/// ID=1
 /// Request a new connection to a user. You must provide your write key so you can read their
 /// messages if they accept
 fn request_connection(requester:&AccountInfo, contact:&AccountInfo, cipher:Vec<u8>)
@@ -95,6 +101,7 @@ fn request_connection(requester:&AccountInfo, contact:&AccountInfo, cipher:Vec<u
     save_data(contact, contact_data);
 }
 
+/// ID=0
 /// Accept a connection request by setting your connection to non-pending & providing your own
 /// connection data to their account with your write key
 fn accept_connection(acceptor:&AccountInfo, requester:&AccountInfo, cipher:Vec<u8>)
@@ -124,15 +131,24 @@ fn load_data(account:&AccountInfo) -> DispatchData {
 }
 
 // Declare and export the program's entrypoint
-entrypoint!(process_instruction);
+entrypoint!(run);
 
 // Program entrypoint's implementation
-pub fn process_instruction(
+pub fn run(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
-    instruction_data: &[u8],
+    data: &[u8],
 ) -> ProgramResult {
-    msg!("Hello World Rust program entrypoint");
+    match dat[0] {
+        0 => accept_connection(&accounts[0], &accounts[1], bits::read_bytes(1, data)),
+        1 => request_connection(&accounts[0], &accounts[1], bits::read_bytes(1, data)),
+        2 => break_connection(&accounts[0], &accounts[1]),
+        3 => send_message(&accounts[0], &accounts[1], bits::read_u64(1, data), bits::read_bytes(9, data)),
+        4 => gc_conversation(&accounts[0], &accounts[1], bits::read_u64(1, data)),
+        5 => gc_conversations(&accounts[0],bits::read_u64(1, data)),
+        _ => msg!("Unsupported Method!")
+    }
+
     Ok(())
 }
 

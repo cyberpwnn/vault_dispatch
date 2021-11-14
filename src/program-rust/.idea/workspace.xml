@@ -11,8 +11,10 @@
   <component name="ChangeListManager">
     <list default="true" id="06f8dc72-876b-4db5-a8fc-e8419537720f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/bits.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/bits.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/lib.rs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +29,9 @@
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="f65hoayo" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedIndex" value="3" />
   </component>
   <component name="ProjectId" id="20tEKKaqlYkN6IMvJUHCBNJOmLZ" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -45,6 +50,7 @@
     <property name="cf.first.check.clang-format" value="false" />
     <property name="cidr.known.project.marker" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="settings.editor.selected.configurable" value="language.rust.cargo" />
   </component>
@@ -53,9 +59,46 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="cargo clean" />
+    </option>
+  </component>
+  <component name="RunManager" selected="Cargo.Build helloworld">
+    <configuration name="Build helloworld" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="build --package dispatch --lib" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Test lib" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="test --package solana-bpf-helloworld --test lib" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="clean" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="clean" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <option name="channel" value="DEFAULT" />
       <option name="requiredFeatures" value="true" />
@@ -77,10 +120,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.Test lib" />
-        <item itemvalue="Cargo.Test lib" />
-        <item itemvalue="Cargo.Test lib" />
-        <item itemvalue="Cargo.Test lib" />
+        <item itemvalue="Cargo.Build helloworld" />
+        <item itemvalue="Cargo.Build helloworld" />
+        <item itemvalue="Cargo.Build helloworld" />
+        <item itemvalue="Cargo.clean" />
         <item itemvalue="Cargo.Test lib" />
       </list>
     </recent_temporary>
@@ -104,7 +147,7 @@
       <workItem from="1636855965414" duration="894000" />
       <workItem from="1636871228772" duration="6698000" />
       <workItem from="1636944336738" duration="192000" />
-      <workItem from="1636930561061" duration="2883000" />
+      <workItem from="1636930561061" duration="3220000" />
     </task>
     <servers />
   </component>

@@ -1,11 +1,10 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use std::collections::BTreeMap;
 use solana_program::{
-    account_info::{next_account_info, AccountInfo},
+    account_info::{AccountInfo},
     entrypoint,
     entrypoint::ProgramResult,
     msg,
-    program_error::ProgramError,
     pubkey::Pubkey,
 };
 mod bits;
@@ -133,7 +132,7 @@ entrypoint!(run);
 
 // Program entrypoint's implementation
 pub fn run(
-    program_id: &Pubkey,
+    _program_id: &Pubkey,
     accounts: &[AccountInfo],
     data: &[u8],
 ) -> ProgramResult {

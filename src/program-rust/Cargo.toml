@@ -1,12 +1,12 @@
 
 [package]
-name = "solana-bpf-helloworld"
-version = "0.0.1"
-description = "Example template program written in Rust"
-authors = ["Solana Maintainers <maintainers@solana.com>"]
-repository = "https://github.com/solana-labs/solana"
-license = "Apache-2.0"
-homepage = "https://solana.com/"
+name = "dispatch"
+version = "1.0.0"
+description = "A very basic Messaging system"
+authors = ["Daniel Mills <cyberpwn>", "Arcane Arts"]
+repository = "https://github.com/VaultBlack/dispatch"
+license = "GPL 3.0"
+homepage = "https://vault.black/"
 edition = "2018"
 
 [features]

@@ -1,4 +1,5 @@
 use borsh::{BorshDeserialize, BorshSerialize};
+use std::collections::BTreeMap;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint,
@@ -8,15 +9,118 @@ use solana_program::{
     pubkey::Pubkey,
 };
 
-/// Define the type of state stored in accounts
+/// Represents all data dispatch will use on an account. Contains connection data & an optional name
+/// of this dispatch data
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
-pub struct GreetingAccount {
-    pub counter: u32,
+pub struct DispatchData {
+    pub connections: BTreeMap<Pubkey, Connection>,
+    pub name: String,
 }
 
+/// Represents a connection to another dispatch account. This is required for Encryption
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Connection {
-    pub state: u8,
+    //! Pending is used for connection requests. After accepting it is set to false
+    pub pending: bool,
+
+    //! The write key to allow anyone to write as this contact
+    pub cipher: Vec<u8>,
+
+    //! The inbox. Contains all messages sent to this user via the contact
+    pub inbox: Vec<Message>,
+}
+
+/// Represents a message. Hopefully encrypted.
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+pub struct Message {
+    //! The time at which this message was sent
+    pub timestamp: u64,
+
+    //! The actual message in bytes
+    pub message: Vec<u8>,
+}
+
+/// Delete all messages in every connection older than the specified time
+fn gc_conversations(holder:&AccountInfo, older_than:u64)
+{
+    let mut holder_data = load_data(holder);
+    for connection in holder_data.connections.keys() {
+        connection.inbox.retain(|&i| i.timestamp > older_than);
+    }
+    save_data(holder, holder_data);
+}
+
+/// Delete all messages in the given connection older than the specified time
+fn gc_conversation(holder:&AccountInfo, contact:&AccountInfo, older_than:u64)
+{
+    let mut holder_data = load_data(holder);
+    let mut connection = holder_data.connections.get_mut(contact.key).unwrap();
+    connection.inbox.retain(|&i| i.timestamp > older_than);
+    save_data(holder, holder_data);
+}
+
+/// Send a message from(account) to(account) at the given time, with the message itself
+fn send_message(from:&AccountInfo, to:&AccountInfo, timestamp:u64, message:Vec<u8>)
+{
+    let mut to_data = load_data(to);
+    let mut connection = to_data.connections.get_mut(from.key).unwrap();
+    connection.inbox.push(Message{
+        timestamp,
+        message,
+    });
+    save_data(to, to_data);
+}
+
+/// Destroy a connection. Removes the source and destination connections & message history
+fn break_connection(requester:&AccountInfo, contact:&AccountInfo)
+{
+    let mut contact_data = load_data(contact);
+    let mut requester_data = load_data(requester);
+    contact_data.connections.remove(requester.key);
+    requester_data.connections.remove(contact.key);
+    save_data(contact, contact_data);
+    save_data(requester, requester_data);
+}
+
+/// Request a new connection to a user. You must provide your write key so you can read their
+/// messages if they accept
+fn request_connection(requester:&AccountInfo, contact:&AccountInfo, cipher:Vec<u8>)
+{
+    let mut contact_data = load_data(contact);
+    contact_data.connections.insert(*requester.key, Connection {
+        cipher,
+        pending: true,
+        inbox: vec!()
+    });
+    save_data(contact, contact_data);
+}
+
+/// Accept a connection request by setting your connection to non-pending & providing your own
+/// connection data to their account with your write key
+fn accept_connection(acceptor:&AccountInfo, requester:&AccountInfo, cipher:Vec<u8>)
+{
+    let mut acceptor_data = load_data(acceptor);
+    let mut requester_data = load_data(requester);
+    requester_data.connections.insert(*acceptor.key, Connection {
+        cipher,
+        pending: false,
+        inbox: vec!()
+    });
+    let mut connection = acceptor_data.connections.get_mut(requester.key).unwrap();
+    connection.pending = false;
+    save_data(requester, requester_data);
+    save_data(acceptor, acceptor_data);
+}
+
+/// Save data utility
+fn save_data(account:&AccountInfo, data:DispatchData)
+{
+    data.serialize(&mut &mut account.data.borrow_mut()[..])?;
+}
+
+/// Load data utility
+fn load_data(account:&AccountInfo) -> DispatchData {
+    return DispatchData::try_from_slice(&account.data.borrow())?;
 }
 
 // Declare and export the program's entrypoint
@@ -29,26 +133,6 @@ pub fn process_instruction(
     instruction_data: &[u8],
 ) -> ProgramResult {
     msg!("Hello World Rust program entrypoint");
-
-    // Iterating accounts is safer then indexing
-    let accounts_iter = &mut accounts.iter();
-
-    // Get the account to say hello to
-    let account = next_account_info(accounts_iter)?;
-
-    // The account must be owned by the program in order to modify its data
-    if account.owner != program_id {
-        msg!("Greeted account does not have the correct program id");
-        return Err(ProgramError::IncorrectProgramId);
-    }
-
-    // Increment and store the number of times the account has been greeted
-    let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
-    greeting_account.counter += 1;
-    greeting_account.serialize(&mut &mut account.data.borrow_mut()[..])?;
-
-    msg!("Greeted {} time(s)!", greeting_account.counter);
-
     Ok(())
 }
 
@@ -58,47 +142,4 @@ mod test {
     use super::*;
     use solana_program::clock::Epoch;
     use std::mem;
-
-    #[test]
-    fn test_sanity() {
-        let program_id = Pubkey::default();
-        let key = Pubkey::default();
-        let mut lamports = 0;
-        let mut data = vec![0; mem::size_of::<u32>()];
-        let owner = Pubkey::default();
-        let account = AccountInfo::new(
-            &key,
-            false,
-            true,
-            &mut lamports,
-            &mut data,
-            &owner,
-            false,
-            Epoch::default(),
-        );
-        let instruction_data: Vec<u8> = Vec::new();
-
-        let accounts = vec![account];
-
-        assert_eq!(
-            GreetingAccount::try_from_slice(&accounts[0].data.borrow())
-                .unwrap()
-                .counter,
-            0
-        );
-        process_instruction(&program_id, &accounts, &instruction_data).unwrap();
-        assert_eq!(
-            GreetingAccount::try_from_slice(&accounts[0].data.borrow())
-                .unwrap()
-                .counter,
-            1
-        );
-        process_instruction(&program_id, &accounts, &instruction_data).unwrap();
-        assert_eq!(
-            GreetingAccount::try_from_slice(&accounts[0].data.borrow())
-                .unwrap()
-                .counter,
-            2
-        );
-    }
 }

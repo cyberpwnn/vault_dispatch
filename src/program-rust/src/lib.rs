@@ -21,23 +21,23 @@ pub struct DispatchData {
 /// Represents a connection to another dispatch account. This is required for Encryption
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Connection {
-    //! Pending is used for connection requests. After accepting it is set to false
+    /// Pending is used for connection requests. After accepting it is set to false
     pub pending: bool,
 
-    //! The write key to allow anyone to write as this contact
+    /// The write key to allow anyone to write as this contact
     pub cipher: Vec<u8>,
 
-    //! The inbox. Contains all messages sent to this user via the contact
+    /// The inbox. Contains all messages sent to this user via the contact
     pub inbox: Vec<Message>,
 }
 
 /// Represents a message. Hopefully encrypted.
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct Message {
-    //! The time at which this message was sent
+    /// The time at which this message was sent
     pub timestamp: u64,
 
-    //! The actual message in bytes
+    /// The actual message in bytes
     pub message: Vec<u8>,
 }
 
@@ -46,9 +46,8 @@ pub struct Message {
 fn gc_conversations(holder:&AccountInfo, older_than:u64)
 {
     let mut holder_data = load_data(holder);
-    for connection in holder_data.connections.keys() {
-        connection.inbox.retain(|&i| i.timestamp > older_than);
-    }
+    holder_data.connections.values_mut()
+        .for_each(|f| f.inbox.retain(|i | i.timestamp > older_than));
     save_data(holder, holder_data);
 }
 
@@ -57,8 +56,8 @@ fn gc_conversations(holder:&AccountInfo, older_than:u64)
 fn gc_conversation(holder:&AccountInfo, contact:&AccountInfo, older_than:u64)
 {
     let mut holder_data = load_data(holder);
-    let mut connection = holder_data.connections.get_mut(contact.key).unwrap();
-    connection.inbox.retain(|&i| i.timestamp > older_than);
+    holder_data.connections.get_mut(contact.key).unwrap()
+        .inbox.retain(|i| i.timestamp > older_than);
     save_data(holder, holder_data);
 }
 
@@ -67,8 +66,7 @@ fn gc_conversation(holder:&AccountInfo, contact:&AccountInfo, older_than:u64)
 fn send_message(from:&AccountInfo, to:&AccountInfo, timestamp:u64, message:Vec<u8>)
 {
     let mut to_data = load_data(to);
-    let mut connection = to_data.connections.get_mut(from.key).unwrap();
-    connection.inbox.push(Message{
+    to_data.connections.get_mut(from.key).unwrap().inbox.push(Message{
         timestamp,
         message,
     });
@@ -122,12 +120,12 @@ fn accept_connection(acceptor:&AccountInfo, requester:&AccountInfo, cipher:Vec<u
 /// Save data utility
 fn save_data(account:&AccountInfo, data:DispatchData)
 {
-    data.serialize(&mut &mut account.data.borrow_mut()[..])?;
+    data.serialize(&mut &mut account.data.borrow_mut()[..]).unwrap();
 }
 
 /// Load data utility
 fn load_data(account:&AccountInfo) -> DispatchData {
-    return DispatchData::try_from_slice(&account.data.borrow())?;
+    return DispatchData::try_from_slice(&account.data.borrow()).unwrap();
 }
 
 // Declare and export the program's entrypoint
@@ -139,7 +137,7 @@ pub fn run(
     accounts: &[AccountInfo],
     data: &[u8],
 ) -> ProgramResult {
-    match dat[0] {
+    match data[0] {
         0 => accept_connection(&accounts[0], &accounts[1], bits::read_bytes(1, data)),
         1 => request_connection(&accounts[0], &accounts[1], bits::read_bytes(1, data)),
         2 => break_connection(&accounts[0], &accounts[1]),

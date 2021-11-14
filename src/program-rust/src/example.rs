@@ -11,12 +11,8 @@ use solana_program::{
 /// Define the type of state stored in accounts
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct GreetingAccount {
+    /// number of greetings
     pub counter: u32,
-}
-
-#[derive(BorshSerialize, BorshDeserialize, Debug)]
-pub struct Connection {
-    pub state: u8,
 }
 
 // Declare and export the program's entrypoint
@@ -24,9 +20,9 @@ entrypoint!(process_instruction);
 
 // Program entrypoint's implementation
 pub fn process_instruction(
-    program_id: &Pubkey,
-    accounts: &[AccountInfo],
-    instruction_data: &[u8],
+    program_id: &Pubkey, // Public key of the account the hello world program was loaded into
+    accounts: &[AccountInfo], // The account to say hello to
+    _instruction_data: &[u8], // Ignored, all helloworld instructions are hellos
 ) -> ProgramResult {
     msg!("Hello World Rust program entrypoint");
 

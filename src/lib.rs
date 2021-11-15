@@ -126,28 +126,6 @@ fn load_data(account:&AccountInfo) -> DispatchData {
     return DispatchData::try_from_slice(&account.data.borrow()).unwrap();
 }
 
-// Declare and export the program's entrypoint
-entrypoint!(run);
-
-// Program entrypoint's implementation
-pub fn run(
-    _program_id: &Pubkey,
-    accounts: &[AccountInfo],
-    data: &[u8],
-) -> ProgramResult {
-    match data[0] {
-        0 => accept_connection(&accounts[0], &accounts[1], read_bytes(1, data)),
-        1 => request_connection(&accounts[0], &accounts[1], read_bytes(1, data)),
-        2 => break_connection(&accounts[0], &accounts[1]),
-        3 => send_message(&accounts[0], &accounts[1], read_u64(1, data), read_bytes(9, data)),
-        4 => gc_conversation(&accounts[0], &accounts[1], read_u64(1, data)),
-        5 => gc_conversations(&accounts[0],read_u64(1, data)),
-        _ => msg!("Unsupported Method!")
-    }
-
-    Ok(())
-}
-
 pub fn read_u32(startindex:u32, data:&[u8]) -> u32
 {
     let start = startindex as usize;
@@ -176,4 +154,26 @@ pub fn read_bytes(startindex:u32, data:&[u8]) -> Vec<u8>
     }
 
     return v;
+}
+
+// Declare and export the program's entrypoint
+entrypoint!(process_instruction);
+
+// Program entrypoint's implementation
+pub fn process_instruction(
+    _program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    data: &[u8],
+) -> ProgramResult {
+    match data[0] {
+        0 => accept_connection(&accounts[0], &accounts[1], read_bytes(1, data)),
+        1 => request_connection(&accounts[0], &accounts[1], read_bytes(1, data)),
+        2 => break_connection(&accounts[0], &accounts[1]),
+        3 => send_message(&accounts[0], &accounts[1], read_u64(1, data), read_bytes(9, data)),
+        4 => gc_conversation(&accounts[0], &accounts[1], read_u64(1, data)),
+        5 => gc_conversations(&accounts[0],read_u64(1, data)),
+        _ => msg!("Unsupported Method!")
+    }
+
+    Ok(())
 }

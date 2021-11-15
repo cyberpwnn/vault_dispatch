@@ -7,7 +7,6 @@ use solana_program::{
     msg,
     pubkey::Pubkey,
 };
-mod bits;
 
 /// Represents all data dispatch will use on an account. Contains connection data & an optional name
 /// of this dispatch data
@@ -137,22 +136,44 @@ pub fn run(
     data: &[u8],
 ) -> ProgramResult {
     match data[0] {
-        0 => accept_connection(&accounts[0], &accounts[1], bits::read_bytes(1, data)),
-        1 => request_connection(&accounts[0], &accounts[1], bits::read_bytes(1, data)),
+        0 => accept_connection(&accounts[0], &accounts[1], read_bytes(1, data)),
+        1 => request_connection(&accounts[0], &accounts[1], read_bytes(1, data)),
         2 => break_connection(&accounts[0], &accounts[1]),
-        3 => send_message(&accounts[0], &accounts[1], bits::read_u64(1, data), bits::read_bytes(9, data)),
-        4 => gc_conversation(&accounts[0], &accounts[1], bits::read_u64(1, data)),
-        5 => gc_conversations(&accounts[0],bits::read_u64(1, data)),
+        3 => send_message(&accounts[0], &accounts[1], read_u64(1, data), read_bytes(9, data)),
+        4 => gc_conversation(&accounts[0], &accounts[1], read_u64(1, data)),
+        5 => gc_conversations(&accounts[0],read_u64(1, data)),
         _ => msg!("Unsupported Method!")
     }
 
     Ok(())
 }
 
-// Sanity tests
-#[cfg(test)]
-mod test {
-    use super::*;
-    use solana_program::clock::Epoch;
-    use std::mem;
+pub fn read_u32(startindex:u32, data:&[u8]) -> u32
+{
+    let start = startindex as usize;
+    return ((data[start] as u32) << 24) + ((data[start+1] as u32) << 16)
+        + ((data[start+2] as u32) << 8) + ((data[start+3] as u32) << 0);
+}
+
+pub fn read_u64(startindex:u32, data:&[u8]) -> u64
+{
+    let start = startindex as usize;
+    return ((data[start] as u64) << 56) + ((data[start] as u64) << 48)
+        + ((data[start] as u64) << 40) + ((data[start] as u64) << 32)
+        + ((data[start] as u64) << 24) + ((data[start] as u64) << 16)
+        + ((data[start] as u64) << 8) + ((data[start] as u64) << 0);
+}
+
+/// Read from a large byte array a sized vector of bytes
+/// Reads the first 4 bytes (u32 length of data)
+pub fn read_bytes(startindex:u32, data:&[u8]) -> Vec<u8>
+{
+    let start = startindex as usize;
+    let len = read_u32(startindex, data) as usize;
+    let mut v:Vec<u8> = vec!();
+    for i in 0..len {
+        v.push(data[i+start+4])
+    }
+
+    return v;
 }

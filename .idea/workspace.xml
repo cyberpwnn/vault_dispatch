@@ -10,6 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="06f8dc72-876b-4db5-a8fc-e8419537720f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/bits.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/documents.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/messaging.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
@@ -47,13 +50,14 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="cidr.known.project.marker" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="settings.editor.selected.configurable" value="language.rust.cargo" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\cyberpwn\Documents\development\workspace\vault\dispatch\src" />
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
@@ -63,6 +67,11 @@
     </option>
   </component>
   <component name="RunManager" selected="Cargo.Build dispatch">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Build dispatch" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="build --package dispatch --lib" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -111,11 +120,6 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="Cargo.Build dispatch" />
       <item itemvalue="Cargo.clean" />
@@ -153,6 +157,7 @@
       <workItem from="1636930561061" duration="3257000" />
       <workItem from="1636934457717" duration="1911000" />
       <workItem from="1636942921401" duration="29000" />
+      <workItem from="1636958221097" duration="2097000" />
     </task>
     <servers />
   </component>

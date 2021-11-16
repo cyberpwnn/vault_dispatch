@@ -60,23 +60,20 @@ pub fn gc_conversation(holder:&AccountInfo, contact:&AccountInfo, older_than:u64
 /// Send a message from(account) to(account) at the given time, with the message itself
 pub fn send_message(from:&AccountInfo, to:&AccountInfo, timestamp:u64, message:Vec<u8>)
 {
-    let mut to_data = load_data(to);
-    to_data.connections.get_mut(from.key).unwrap().inbox.push(Message{
+    let mut from_data = load_data(from);
+    from_data.connections.get_mut(to.key).unwrap().outbox.push(Message{
         timestamp,
         message,
     });
-    save_data(to, to_data);
+    save_data(from, from_data);
 }
 
 /// ID=2
-/// Destroy a connection. Removes the source and destination connections & message history
+/// Destroy a connection. Removes the requester side connection & message history
 pub fn break_connection(requester:&AccountInfo, contact:&AccountInfo)
 {
-    let mut contact_data = load_data(contact);
     let mut requester_data = load_data(requester);
-    contact_data.connections.remove(requester.key);
     requester_data.connections.remove(contact.key);
-    save_data(contact, contact_data);
     save_data(requester, requester_data);
 }
 
